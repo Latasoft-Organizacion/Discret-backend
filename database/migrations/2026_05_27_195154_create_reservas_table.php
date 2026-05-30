@@ -16,6 +16,13 @@ return new class extends Migration
             $table->string('codigo_reserva')->unique();
             $table->foreignId('cliente_id')->nullable()->constrained('clientes')->nullOnDelete();
             $table->foreignId('habitacion_id')->constrained('habitaciones');
+            
+            $table->unsignedBigInteger('motel_id');
+            $table->foreign('motel_id')
+                ->references('id_motel')
+                ->on('motel')
+                ->onDelete('cascade');
+            
             $table->foreignId('creada_por_admin_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('nombre_cliente')->nullable();
             $table->string('telefono_cliente')->nullable();

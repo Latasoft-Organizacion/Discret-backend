@@ -12,6 +12,9 @@ class Reserva extends Model
         'codigo_reserva',
         'cliente_id',
         'habitacion_id',
+
+        'motel_id',
+
         'creada_por_admin_id',
         'nombre_cliente',
         'telefono_cliente',
@@ -49,5 +52,11 @@ class Reserva extends Model
     public function valoracion(): HasOne
     {
         return $this->hasOne(Valoracion::class);
+    }
+    
+
+    public function motel(): BelongsTo
+    {
+        return $this->belongsTo(Motel::class);
     }
 }

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('habitaciones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tipo_habitacion_id')->constrained('tipo_habitaciones');
+            $table->unsignedBigInteger('id_motel');
             $table->string('numero')->unique();
             $table->string('nombre');
             $table->text('descripcion')->nullable();
@@ -21,6 +22,11 @@ return new class extends Migration
             $table->enum('estado', ['disponible', 'ocupada', 'limpieza', 'bloqueada'])->default('disponible');
             $table->boolean('activa')->default(true);
             $table->timestamps();
+
+            $table->foreign('id_motel')
+                ->references('id_motel')
+                ->on('motel')
+                ->onDelete('cascade');
         });
     }
 

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'id_motel',
     ];
 
     /**
@@ -46,4 +47,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELACIONES
+    |--------------------------------------------------------------------------
+    */
+
+    public function motel()
+    {
+        return $this->belongsTo(Motel::class, 'id_motel');
+    }
+    
 }
