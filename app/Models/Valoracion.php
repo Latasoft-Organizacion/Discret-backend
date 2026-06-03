@@ -10,6 +10,7 @@ class Valoracion extends Model
     protected $table = 'valoraciones';
 
     protected $fillable = [
+        'id_motel',
         'reserva_id',
         'cliente_id',
         'puntuacion',
@@ -38,5 +39,10 @@ class Valoracion extends Model
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class);
+    }
+
+    public function motel(): BelongsTo
+    {
+        return $this->belongsTo(Motel::class, 'id_motel');
     }
 }

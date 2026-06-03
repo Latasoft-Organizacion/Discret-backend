@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_motel')->nullable();
             $table->string('nombre');
             $table->string('apellido');
             $table->string('telefono');
@@ -23,6 +24,11 @@ return new class extends Migration
             $table->boolean('activo')->default(true);
             $table->timestamp('ultimo_acceso_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('id_motel')
+                ->references('id_motel')
+                ->on('motel')
+                ->nullOnDelete();
         });
     }
 

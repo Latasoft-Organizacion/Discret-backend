@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('envios_programados', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_motel')->nullable();
             $table->foreignId('reserva_id')->nullable()->constrained('reservas')->cascadeOnDelete();
             $table->foreignId('cliente_id')->nullable()->constrained('clientes')->nullOnDelete();
             $table->enum('tipo', ['confirmacion_reserva', 'qr_porteria', 'valoracion_post_salida']);
@@ -25,6 +26,11 @@ return new class extends Migration
             $table->enum('estado', ['pendiente', 'enviado', 'fallido'])->default('pendiente');
             $table->text('error')->nullable();
             $table->timestamps();
+
+            $table->foreign('id_motel')
+                ->references('id_motel')
+                ->on('motel')
+                ->nullOnDelete();
         });
     }
 

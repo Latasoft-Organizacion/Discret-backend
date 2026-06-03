@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('reservas', function (Blueprint $table) {
             $table->id();
             $table->string('codigo_reserva')->unique();
+            $table->unsignedBigInteger('id_motel');
             $table->foreignId('cliente_id')->nullable()->constrained('clientes')->nullOnDelete();
             $table->foreignId('habitacion_id')->constrained('habitaciones');
-            
-            $table->unsignedBigInteger('motel_id');
-            $table->foreign('motel_id')
+
+            $table->foreign('id_motel')
                 ->references('id_motel')
                 ->on('motel')
                 ->onDelete('cascade');
-            
+
             $table->foreignId('creada_por_admin_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('nombre_cliente')->nullable();
             $table->string('telefono_cliente')->nullable();

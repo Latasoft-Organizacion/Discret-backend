@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\EnvioProgramado;
+use App\Models\Habitacion;
 use App\Models\Reserva;
 use App\Models\Valoracion;
+use App\Support\CurrentMotel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -13,8 +15,11 @@ class ReservaController extends Controller
 {
     public function index(Request $request)
     {
+        $idMotel = CurrentMotel::id($request);
+
         return Reserva::query()
-            ->with(['cliente', 'habitacion.tipoHabitacion', 'valoracion'])
+            ->with(['cliente', 'habitacion.tipoHabitacion', 'motel', 'valoracion'])
+            ->where('id_motel', $idMotel)
             ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->estado))
             ->when($request->filled('buscar'), function ($query) use ($request) {
                 $buscar = $request->buscar;
@@ -33,6 +38,8 @@ class ReservaController extends Controller
 
     public function store(Request $request)
     {
+        $idMotel = CurrentMotel::id($request);
+
         $data = $request->validate([
             'cliente_id' => ['nullable', 'exists:clientes,id'],
             'habitacion_id' => ['required', 'exists:habitaciones,id'],
@@ -47,17 +54,22 @@ class ReservaController extends Controller
             'comentario' => ['nullable', 'string'],
         ]);
 
+        $habitacion = Habitacion::where('id', $data['habitacion_id'])
+            ->where('id_motel', $idMotel)
+            ->firstOrFail();
+
+        $data['id_motel'] = $habitacion->id_motel;
         $data['codigo_reserva'] = $this->generarCodigoReserva();
         $data['qr_token'] = Str::uuid()->toString();
 
         $reserva = Reserva::create($data);
 
-        return response()->json($reserva->load(['cliente', 'habitacion.tipoHabitacion']), 201);
+        return response()->json($reserva->load(['cliente', 'habitacion.tipoHabitacion', 'motel']), 201);
     }
 
     public function show(Reserva $reserva)
     {
-        return $reserva->load(['cliente', 'habitacion.tipoHabitacion', 'valoracion']);
+        return $reserva->load(['cliente', 'habitacion.tipoHabitacion', 'motel', 'valoracion']);
     }
 
     public function update(Request $request, Reserva $reserva)
@@ -76,13 +88,21 @@ class ReservaController extends Controller
             'comentario' => ['nullable', 'string'],
         ]);
 
+        if (isset($data['habitacion_id'])) {
+            $habitacion = Habitacion::where('id', $data['habitacion_id'])
+                ->where('id_motel', $reserva->id_motel)
+                ->firstOrFail();
+
+            $data['id_motel'] = $habitacion->id_motel;
+        }
+
         $reserva->update($data);
 
         if (($data['estado'] ?? null) === 'finalizada') {
             $this->programarValoracion($reserva->fresh());
         }
 
-        return $reserva->load(['cliente', 'habitacion.tipoHabitacion', 'valoracion']);
+        return $reserva->load(['cliente', 'habitacion.tipoHabitacion', 'motel', 'valoracion']);
     }
 
     public function destroy(Reserva $reserva)
@@ -105,9 +125,11 @@ class ReservaController extends Controller
             ['reserva_id' => $reserva->id],
             [
                 'cliente_id' => $reserva->cliente_id,
+                'id_motel' => $reserva->id_motel,
                 'token' => Str::uuid()->toString(),
             ],
         );
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'http://localhost:5173/discret'), '/');
 
         EnvioProgramado::firstOrCreate(
             [
@@ -116,10 +138,11 @@ class ReservaController extends Controller
             ],
             [
                 'cliente_id' => $reserva->cliente_id,
+                'id_motel' => $reserva->id_motel,
                 'canal' => 'correo',
                 'destinatario' => $reserva->correo_cliente ?? $reserva->cliente?->correo ?? 'pendiente@discret.cl',
                 'asunto' => 'Cuéntanos cómo fue tu experiencia en DISCRET',
-                'mensaje' => url("/valoracion/{$valoracion->token}"),
+                'mensaje' => "{$frontendUrl}/valoracion/{$valoracion->token}",
                 'programado_para' => $reserva->fecha_salida->copy()->addMinutes(30),
                 'estado' => 'pendiente',
             ],

@@ -10,6 +10,7 @@ class EnvioProgramado extends Model
     protected $table = 'envios_programados';
 
     protected $fillable = [
+        'id_motel',
         'reserva_id',
         'cliente_id',
         'tipo',
@@ -39,5 +40,10 @@ class EnvioProgramado extends Model
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class);
+    }
+
+    public function motel(): BelongsTo
+    {
+        return $this->belongsTo(Motel::class, 'id_motel');
     }
 }

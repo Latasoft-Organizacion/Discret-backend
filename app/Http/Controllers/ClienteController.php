@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use App\Support\CurrentMotel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -10,13 +11,17 @@ use Illuminate\Validation\Rule;
 
 class ClienteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Cliente::latest()->paginate(20);
+        return Cliente::where('id_motel', CurrentMotel::id($request))
+            ->latest()
+            ->paginate(20);
     }
 
     public function store(Request $request)
     {
+        $idMotel = CurrentMotel::id($request);
+
         $data = $request->validate([
             'nombre' => ['required', 'string', 'max:120'],
             'apellido' => ['required', 'string', 'max:120'],
@@ -30,6 +35,8 @@ class ClienteController extends Controller
         if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
+
+        $data['id_motel'] = $idMotel;
 
         return response()->json(Cliente::create($data), 201);
     }

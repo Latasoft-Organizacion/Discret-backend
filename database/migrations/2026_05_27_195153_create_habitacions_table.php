@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('habitaciones', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tipo_habitacion_id')->constrained('tipo_habitaciones');
             $table->unsignedBigInteger('id_motel');
-            $table->string('numero')->unique();
+            $table->foreignId('tipo_habitacion_id')->constrained('tipo_habitaciones');
+            $table->string('numero');
             $table->string('nombre');
             $table->text('descripcion')->nullable();
             $table->unsignedInteger('precio')->default(0);
@@ -27,6 +27,8 @@ return new class extends Migration
                 ->references('id_motel')
                 ->on('motel')
                 ->onDelete('cascade');
+
+            $table->unique(['id_motel', 'numero']);
         });
     }
 

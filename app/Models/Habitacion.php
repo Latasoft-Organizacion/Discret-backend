@@ -11,6 +11,7 @@ class Habitacion extends Model
     protected $table = 'habitaciones';
 
     protected $fillable = [
+        'id_motel',
         'tipo_habitacion_id',
         'numero',
         'nombre',
@@ -32,8 +33,7 @@ class Habitacion extends Model
     {
         return $this->belongsTo(TipoHabitacion::class);
     }
-    
-        public function motel(): BelongsTo
+    public function motel(): BelongsTo
     {
         return $this->belongsTo(Motel::class, 'id_motel');
     }

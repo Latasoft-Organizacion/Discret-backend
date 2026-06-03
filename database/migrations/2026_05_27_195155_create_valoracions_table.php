@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('valoraciones', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_motel')->nullable();
             $table->foreignId('reserva_id')->constrained('reservas')->cascadeOnDelete();
             $table->foreignId('cliente_id')->nullable()->constrained('clientes')->nullOnDelete();
             $table->unsignedTinyInteger('puntuacion')->nullable();
@@ -22,6 +23,11 @@ return new class extends Migration
             $table->timestamp('enviada_at')->nullable();
             $table->timestamp('respondida_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('id_motel')
+                ->references('id_motel')
+                ->on('motel')
+                ->nullOnDelete();
         });
     }
 

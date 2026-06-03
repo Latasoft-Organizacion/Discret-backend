@@ -13,10 +13,18 @@ return new class extends Migration
     {
         Schema::create('configuracion_sistema', function (Blueprint $table) {
             $table->id();
-            $table->string('clave')->unique();
+            $table->unsignedBigInteger('id_motel');
+            $table->string('clave');
             $table->json('valor');
             $table->string('descripcion')->nullable();
             $table->timestamps();
+
+            $table->foreign('id_motel')
+                ->references('id_motel')
+                ->on('motel')
+                ->onDelete('cascade');
+
+            $table->unique(['id_motel', 'clave']);
         });
     }
 

@@ -10,11 +10,9 @@ class Reserva extends Model
 {
     protected $fillable = [
         'codigo_reserva',
+        'id_motel',
         'cliente_id',
         'habitacion_id',
-
-        'motel_id',
-
         'creada_por_admin_id',
         'nombre_cliente',
         'telefono_cliente',
@@ -57,6 +55,6 @@ class Reserva extends Model
 
     public function motel(): BelongsTo
     {
-        return $this->belongsTo(Motel::class);
+        return $this->belongsTo(Motel::class, 'id_motel');
     }
 }

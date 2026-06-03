@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Valoracion;
+use App\Support\CurrentMotel;
 use Illuminate\Http\Request;
 
 class ValoracionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         return Valoracion::with(['reserva.habitacion', 'cliente'])
+            ->where('id_motel', CurrentMotel::id($request))
             ->whereNotNull('respondida_at')
             ->latest('respondida_at')
             ->paginate(20);

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,13 +12,13 @@ return new class extends Migration
 
             $table->bigIncrements('id_suscripcion');
 
-            $table->timestamp('fecha_inicio');
-            $table->timestamp('fecha_fin');
+            $table->dateTime('fecha_inicio')->nullable();
+            $table->dateTime('fecha_fin')->nullable();
 
-            $table->enum('estado', ['ACTIVA', 'PENDIENTE', 'VENCIDA', 'SUSPENDIDA', 'TRIAL']);
+            $table->enum('estado', ['ACTIVA', 'PENDIENTE', 'VENCIDA', 'SUSPENDIDA', 'TRIAL'])->default('PENDIENTE');
 
-            $table->string('metodo_pago', 30);
-            $table->decimal('monto_pagado', 10, 2);
+            $table->string('metodo_pago', 30)->nullable();
+            $table->decimal('monto_pagado', 10, 2)->default(0);
 
             $table->unsignedBigInteger('id_plan');
             $table->unsignedBigInteger('id_motel');
@@ -41,4 +41,5 @@ return new class extends Migration
         Schema::dropIfExists('suscripcion');
     }
 };
+
 

@@ -3,23 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Models\TipoHabitacion;
+use App\Support\CurrentMotel;
 use Illuminate\Http\Request;
 
 class TipoHabitacionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return TipoHabitacion::where('activo', true)->orderBy('nombre')->get();
+        return TipoHabitacion::where('id_motel', CurrentMotel::id($request))
+            ->where('activo', true)
+            ->orderBy('nombre')
+            ->get();
     }
 
     public function store(Request $request)
     {
+        $idMotel = CurrentMotel::id($request);
+
         $data = $request->validate([
             'nombre' => ['required', 'string', 'max:120'],
             'descripcion' => ['nullable', 'string'],
             'precio_base' => ['required', 'integer', 'min:0'],
             'activo' => ['sometimes', 'boolean'],
         ]);
+
+        $data['id_motel'] = $idMotel;
 
         return response()->json(TipoHabitacion::create($data), 201);
     }
